@@ -161,6 +161,7 @@ impl<T: PartialEq + Eq + Hash> From<Vec<GenericFact<T>>> for FactSet<T> {
 #[cfg(test)]
 mod fact_set_tests {
     use super::*;
+    use std::iter::FromIterator;
 
     type FactTest = GenericFact<u16>;
 
@@ -190,7 +191,13 @@ mod fact_set_tests {
         let result: HashSet<&FactTest> = a.added_facts(&b).collect();
         assert_eq!(
             result,
-            HashSet::from([&("test/f", 4u16).into(), &("test/g", 4u16).into(),])
+            HashSet::from_iter(
+                [
+                    GenericFact::new("test/f".into(), 4u16),
+                    GenericFact::new("test/g".into(), 4u16),
+                ]
+                .into_iter()
+            )
         );
     }
     #[test]
@@ -200,7 +207,13 @@ mod fact_set_tests {
         let result: HashSet<&FactTest> = a.removed_facts(&b).collect();
         assert_eq!(
             result,
-            HashSet::from([&("test/a", 0).into(), &("test/b", 1).into(),])
+            HashSet::from_iter(
+                [
+                    GenericFact::new("test/a".into(), 0),
+                    GenericFact::new("test/b".into(), 1),
+                ]
+                .into_iter()
+            )
         );
     }
     #[test]
@@ -210,7 +223,14 @@ mod fact_set_tests {
         let result: HashSet<(&FactTest, &FactTest)> = a.changed_facts(&b).collect();
         assert_eq!(
             result,
-            HashSet::from([(&("test/e", 3).into(), &("test/e", 2).into()),])
+            HashSet::from_iter(
+                [(
+                    &GenericFact::new("test/e".into(), 3),
+                    &GenericFact::new("test/e".into(), 2),
+                )]
+                .into_iter()
+                .map(|x| *x)
+            )
         );
     }
 }
